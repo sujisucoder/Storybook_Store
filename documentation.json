@@ -98,7 +98,7 @@
                 }
             ],
             "stylesData": "",
-            "templateData": "<app-task></app-task>"
+            "templateData": "<app-tasklist></app-tasklist>"
         },
         {
             "name": "TaskComponent",
@@ -250,24 +250,131 @@
             "assetsDirs": [],
             "styleUrlsData": [
                 {
-                    "data": "",
+                    "data": ".list-item {\r\n  font-size: 14px;\r\n  line-height: 20px;\r\n  display: flex;\r\n  flex-wrap: wrap;\r\n  height: 3rem;\r\n  width: 100%;\r\n  background: white;\r\n  transition: all ease-out 150ms;\r\n}\r\n\r\n.list-item .title {\r\n  overflow: hidden;\r\n  text-overflow: ellipsis;\r\n  white-space: nowrap;\r\n  flex: 1;\r\n}\r\n\r\n.list-item input[type=\"text\"] {\r\n  background: transparent;\r\n  width: 100%;\r\n}\r\n\r\n.list-item input[type=\"text\"]:focus {\r\n  cursor: text;\r\n}\r\n\r\nh1,\r\np,\r\nlabel {\r\n  margin: 0;\r\n  padding: 0;\r\n  border: 0;\r\n  font-weight: normal;\r\n  font-style: normal;\r\n  font-size: 100%;\r\n  line-height: 1;\r\n  font-family: inherit;\r\n  vertical-align: baseline;\r\n  line-height: normal;\r\n  font-family: \"Nunito Sans\", \"Helvetica Neue\", Helvetica, Arial, sans-serif;\r\n}",
                     "styleUrl": "./task.component.css"
                 }
             ],
             "stylesData": "",
             "templateData": "<div class=\"list-item {{ task.state }}\">\n    <label\n      [attr.aria-label]=\"'archiveTask-' + task.id\"\n      for=\"checked-{{ task.id }}\"\n      class=\"checkbox\"\n    >\n      <input\n        type=\"checkbox\"\n        disabled=\"true\"\n        [defaultChecked]=\"task.state === 'TASK_ARCHIVED'\"\n        name=\"checked-{{ task.id }}\"\n        id=\"checked-{{ task.id }}\"\n      />\n      <span class=\"checkbox-custom\" (click)=\"onArchive(task.id)\"></span>\n    </label>\n    <label\n      [attr.aria-label]=\"task.title + ''\"\n      for=\"title-{{ task.id }}\"\n      class=\"title\"\n    >\n      <input\n        type=\"text\"\n        [value]=\"task.title\"\n        readonly=\"true\"\n        id=\"title-{{ task.id }}\"\n        name=\"title-{{ task.id }}\"\n        placeholder=\"Input title\"\n      />\n    </label>\n    <button\n      *ngIf=\"task?.state !== 'TASK_ARCHIVED'\"\n      class=\"pin-button\"\n      [attr.aria-label]=\"'pinTask-' + task.id\"\n      (click)=\"onPin(task.id)\"\n    >\n      <span class=\"icon-star\"></span>\n    </button>\n  </div>\n"
+        },
+        {
+            "name": "TasklistComponent",
+            "id": "component-TasklistComponent-0a2b2fd00f0c6f4e862b8d6cbd2b1df40d1961715a9336aa68380f60c51e0ddcfe14df12f2b078acb18dba17443e3c8f153cce27ba46555d617e68aa62155588",
+            "file": "src/app/components/tasklist/tasklist.component.ts",
+            "encapsulation": [],
+            "entryComponents": [],
+            "inputs": [],
+            "outputs": [],
+            "providers": [],
+            "selector": "app-tasklist",
+            "styleUrls": [
+                "./tasklist.component.css"
+            ],
+            "styles": [],
+            "templateUrl": [
+                "./tasklist.component.html"
+            ],
+            "viewProviders": [],
+            "inputsClass": [
+                {
+                    "name": "loading",
+                    "defaultValue": "false",
+                    "deprecated": false,
+                    "deprecationMessage": "",
+                    "line": 21,
+                    "type": "boolean",
+                    "decorators": []
+                },
+                {
+                    "name": "tasks",
+                    "deprecated": false,
+                    "deprecationMessage": "",
+                    "line": 30,
+                    "type": "Task[]",
+                    "decorators": []
+                }
+            ],
+            "outputsClass": [
+                {
+                    "name": "onArchiveTask",
+                    "defaultValue": "new EventEmitter()",
+                    "deprecated": false,
+                    "deprecationMessage": "",
+                    "line": 27,
+                    "type": "EventEmitter<any>"
+                },
+                {
+                    "name": "onPinTask",
+                    "defaultValue": "new EventEmitter()",
+                    "deprecated": false,
+                    "deprecationMessage": "",
+                    "line": 24,
+                    "type": "EventEmitter<any>"
+                }
+            ],
+            "propertiesClass": [],
+            "methodsClass": [],
+            "deprecated": false,
+            "deprecationMessage": "",
+            "hostBindings": [],
+            "hostListeners": [],
+            "description": "",
+            "rawdescription": "\n",
+            "type": "component",
+            "sourceCode": "import { Component, EventEmitter, Input, Output } from '@angular/core';\nimport { Task } from '../../models/task.model';\n\n@Component({\n  selector: 'app-tasklist',\n  templateUrl: './tasklist.component.html',\n  styleUrls: ['./tasklist.component.css'],\n})\nexport class TasklistComponent {\n  /**\n   * @ignore\n   * Component property to define ordering of tasks\n   */\n  tasksInOrder: Task[] = [\n    { id: '1', title: 'Something', state: 'TASK_INBOX' },\n    { id: '2', title: 'Something more', state: 'TASK_INBOX' },\n    { id: '3', title: 'Something else', state: 'TASK_INBOX' },\n    { id: '4', title: 'Something again', state: 'TASK_INBOX' },\n  ];\n\n  @Input() loading = false;\n\n  // tslint:disable-next-line: no-output-on-prefix\n  @Output() onPinTask: EventEmitter<any> = new EventEmitter();\n\n  // tslint:disable-next-line: no-output-on-prefix\n  @Output() onArchiveTask: EventEmitter<any> = new EventEmitter();\n\n  @Input()\n  set tasks(arr: Task[]) {\n    const initialTasks = [\n      ...arr.filter((t) => t.state !== 'TASK_PINNED'),\n      ...arr.filter((t) => t.state === 'TASK_PINNED'),\n    ];\n    const filteredTasks = initialTasks.filter(\n      (t) => t.state === 'TASK_INBOX' || t.state === 'TASK_PINNED'\n    );\n    this.tasksInOrder = filteredTasks.filter(\n      (t) => t.state === 'TASK_INBOX' || t.state === 'TASK_PINNED'\n    );\n  }\n}\n",
+            "assetsDirs": [],
+            "styleUrlsData": [
+                {
+                    "data": ".list-item {\r\n    font-size: 14px;\r\n    line-height: 20px;\r\n    display: flex;\r\n    flex-wrap: wrap;\r\n    height: 3rem;\r\n    width: 100%;\r\n    background: white;\r\n    transition: all ease-out 150ms;\r\n  }\r\n  \r\n  .list-item .title {\r\n    overflow: hidden;\r\n    text-overflow: ellipsis;\r\n    white-space: nowrap;\r\n    flex: 1;\r\n  }\r\n  \r\n  .list-item input[type=\"text\"] {\r\n    background: transparent;\r\n    width: 100%;\r\n  }\r\n  \r\n  .list-item input[type=\"text\"]:focus {\r\n    cursor: text;\r\n  }\r\n  \r\n  h1,\r\n  p,\r\n  label {\r\n    margin: 0;\r\n    padding: 0;\r\n    border: 0;\r\n    font-weight: normal;\r\n    font-style: normal;\r\n    font-size: 100%;\r\n    line-height: 1;\r\n    font-family: inherit;\r\n    vertical-align: baseline;\r\n    line-height: normal;\r\n    font-family: \"Nunito Sans\", \"Helvetica Neue\", Helvetica, Arial, sans-serif;\r\n  }\r\n\r\n  \r\n.list-items {\r\n  position: relative;\r\n  background: white;\r\n  min-height: 288px;\r\n}\r\n\r\n.list-items .select-placeholder {\r\n  border: none;\r\n  width: 48px;\r\n}\r\n\r\n\r\n.wrapper-message {\r\n  position: absolute;\r\n  top: 45%;\r\n  right: 0;\r\n  bottom: auto;\r\n  left: 0;\r\n  width: auto;\r\n  height: auto;\r\n  transform: translate3d(0, -50%, 0);\r\n  text-align: center;\r\n}\r\n\r\n.wrapper-message [class^=\"icon-\"],\r\n.wrapper-message [class*=\" icon-\"] {\r\n  font-size: 48px;\r\n  line-height: 56px;\r\n  color: #2cc5d2;\r\n  display: block;\r\n}\r\n\r\n.wrapper-message .title-message {\r\n  font-size: 16px;\r\n  line-height: 24px;\r\n  font-family: \"Nunito Sans\", \"Helvetica Neue\", Helvetica, Arial, sans-serif;\r\n  font-weight: 800;\r\n  color: #4a5568;\r\n}\r\n\r\n.wrapper-message .subtitle-message {\r\n  font-size: 14px;\r\n  line-height: 20px;\r\n  color: #4a5568;\r\n}",
+                    "styleUrl": "./tasklist.component.css"
+                }
+            ],
+            "stylesData": "",
+            "accessors": {
+                "tasks": {
+                    "name": "tasks",
+                    "setSignature": {
+                        "name": "tasks",
+                        "type": "void",
+                        "deprecated": false,
+                        "deprecationMessage": "",
+                        "args": [
+                            {
+                                "name": "arr",
+                                "type": "Task[]",
+                                "deprecated": false,
+                                "deprecationMessage": ""
+                            }
+                        ],
+                        "returnType": "void",
+                        "line": 30,
+                        "jsdoctags": [
+                            {
+                                "name": "arr",
+                                "type": "Task[]",
+                                "deprecated": false,
+                                "deprecationMessage": "",
+                                "tagName": {
+                                    "text": "param"
+                                }
+                            }
+                        ]
+                    }
+                }
+            },
+            "templateData": "<div class=\"list-items\">\n    <app-task\n      *ngFor=\"let task of tasksInOrder\"\n      [task]=\"task\"\n      (onArchiveTask)=\"onArchiveTask.emit($event)\"\n      (onPinTask)=\"onPinTask.emit($event)\"\n    >\n    </app-task>\n    <div\n      *ngIf=\"tasksInOrder.length === 0 && !loading\"\n      class=\"wrapper-message\"\n    >\n      <span class=\"icon-check\"></span>\n      <p class=\"title-message\">You have no tasks</p>\n      <p class=\"subtitle-message\">Sit back and relax</p>\n    </div>\n    <div *ngIf=\"loading\">\n      <div *ngFor=\"let i of [1, 2, 3, 4, 5, 6]\" class=\"loading-item\">\n        <span class=\"glow-checkbox\"></span>\n        <span class=\"glow-text\">\n          <span>Loading</span> <span>cool</span> <span>state</span>\n        </span>\n      </div>\n    </div>\n  </div>"
         }
     ],
     "modules": [
         {
             "name": "AppModule",
-            "id": "module-AppModule-beb29a4a1901530bdc4758b268a12530ba683b7c443e0a6abcf69567ff985660290ded3dffec9c1100f2cd16dfdc5b50b3001bb47712f8a972661b9cb195f236",
+            "id": "module-AppModule-656268a0003d1704c5a6f292f593f983fb04e6d155e83ccf301ce8092ad091e6f717c78d0f0ad6e08349c4267f3e7820d7d0cadec139bd368e77a7dcf1dc20de",
             "description": "",
             "deprecationMessage": "",
             "deprecated": false,
             "file": "src/app/app.module.ts",
             "methods": [],
-            "sourceCode": "import { NgModule } from '@angular/core';\r\nimport { BrowserModule } from '@angular/platform-browser';\r\n\r\nimport { AppRoutingModule } from './app-routing.module';\r\nimport { AppComponent } from './app.component';\r\nimport { TaskComponent } from './components/task/task.component';\r\n\r\n@NgModule({\r\n  declarations: [AppComponent, TaskComponent],\r\n  imports: [BrowserModule, AppRoutingModule],\r\n  providers: [],\r\n  bootstrap: [AppComponent],\r\n})\r\nexport class AppModule {}\r\n",
+            "sourceCode": "import { NgModule } from '@angular/core';\r\nimport { BrowserModule } from '@angular/platform-browser';\r\n\r\nimport { AppRoutingModule } from './app-routing.module';\r\nimport { AppComponent } from './app.component';\r\nimport { TaskComponent } from './components/task/task.component';\r\nimport { TasklistComponent } from './components/tasklist/tasklist.component';\r\n\r\n@NgModule({\r\n  declarations: [AppComponent, TaskComponent, TasklistComponent],\r\n  imports: [BrowserModule, AppRoutingModule],\r\n  providers: [],\r\n  bootstrap: [AppComponent],\r\n})\r\nexport class AppModule {}\r\n",
             "children": [
                 {
                     "type": "providers",
@@ -281,6 +388,9 @@
                         },
                         {
                             "name": "TaskComponent"
+                        },
+                        {
+                            "name": "TasklistComponent"
                         }
                     ]
                 },
@@ -370,6 +480,16 @@
                 "defaultValue": "{\r\n  args: {\r\n    task: {\r\n      id: '1',\r\n      title: 'Test Task',\r\n      state: 'TASK_ARCHIVED',\r\n    },\r\n  },\r\n}"
             },
             {
+                "name": "Default",
+                "ctype": "miscellaneous",
+                "subtype": "variable",
+                "file": "src/app/components/tasklist/tasklist.stories.ts",
+                "deprecated": false,
+                "deprecationMessage": "",
+                "type": "tasklistStyleStory",
+                "defaultValue": "{\r\n  args: {\r\n    tasks: [\r\n      {\r\n        ...(SimpleTaskStyleStory.DefaultTask.args?.['task'] as Task),\r\n        id: '1',\r\n        title: 'Task 1',\r\n      },\r\n      {\r\n        ...(SimpleTaskStyleStory.DefaultTask.args?.['task'] as Task),\r\n        id: '2',\r\n        title: 'Task 2',\r\n      },\r\n      {\r\n        ...(SimpleTaskStyleStory.DefaultTask.args?.['task'] as Task),\r\n        id: '3',\r\n        title: 'Task 3',\r\n      },\r\n      {\r\n        ...(SimpleTaskStyleStory.DefaultTask.args?.['task'] as Task),\r\n        id: '4',\r\n        title: 'Task 4',\r\n      },\r\n      {\r\n        ...(SimpleTaskStyleStory.DefaultTask.args?.['task'] as Task),\r\n        id: '5',\r\n        title: 'Task 5',\r\n      },\r\n      {\r\n        ...(SimpleTaskStyleStory.DefaultTask.args?.['task'] as Task),\r\n        id: '6',\r\n        title: 'Task 6',\r\n      },\r\n      {\r\n        ...(SimpleTaskStyleStory.DefaultTask.args?.['task'] as Task),\r\n        id: '7',\r\n        title: 'Task 7',\r\n      },\r\n    ],\r\n  },\r\n}"
+            },
+            {
                 "name": "DefaultTask",
                 "ctype": "miscellaneous",
                 "subtype": "variable",
@@ -378,6 +498,26 @@
                 "deprecationMessage": "",
                 "type": "Story",
                 "defaultValue": "{\r\n  args: {\r\n    task: {\r\n      id: '1',\r\n      title: 'Test Task',\r\n      state: 'TASK_INBOX',\r\n    },\r\n  },\r\n}"
+            },
+            {
+                "name": "Empty",
+                "ctype": "miscellaneous",
+                "subtype": "variable",
+                "file": "src/app/components/tasklist/tasklist.stories.ts",
+                "deprecated": false,
+                "deprecationMessage": "",
+                "type": "tasklistStyleStory",
+                "defaultValue": "{\r\n  args: {\r\n    ...Loading.args,\r\n    loading: false,\r\n  },\r\n}"
+            },
+            {
+                "name": "Loading",
+                "ctype": "miscellaneous",
+                "subtype": "variable",
+                "file": "src/app/components/tasklist/tasklist.stories.ts",
+                "deprecated": false,
+                "deprecationMessage": "",
+                "type": "tasklistStyleStory",
+                "defaultValue": "{\r\n  args: {\r\n    tasks: [],\r\n    loading: true,\r\n  },\r\n}"
             },
             {
                 "name": "LongTitle",
@@ -407,7 +547,17 @@
                 "deprecated": false,
                 "deprecationMessage": "",
                 "type": "Meta<TaskComponent>",
-                "defaultValue": "{\r\n  /* 👇 The title prop is optional.\r\n   * See https://storybook.js.org/docs/angular/configure/overview#configure-story-loading\r\n   * to learn how to generate automatic titles\r\n   */\r\n  title: 'TaskStyle/TaskComponent',\r\n  component: TaskComponent,\r\n}"
+                "defaultValue": "{\r\n  /* 👇 The title prop is optional.\r\n   * See https://storybook.js.org/docs/angular/configure/overview#configure-story-loading\r\n   * to learn how to generate automatic titles\r\n   */\r\n  title: 'Task/TaskComponent',\r\n  component: TaskComponent,\r\n}"
+            },
+            {
+                "name": "metaDetail",
+                "ctype": "miscellaneous",
+                "subtype": "variable",
+                "file": "src/app/components/tasklist/tasklist.stories.ts",
+                "deprecated": false,
+                "deprecationMessage": "",
+                "type": "Meta<TasklistComponent>",
+                "defaultValue": "{\r\n  /* 👇 The title prop is optional.\r\n   * See https://storybook.js.org/docs/angular/configure/overview#configure-story-loading\r\n   * to learn how to generate automatic titles\r\n   */\r\n  title: 'Task/TaskListComponent',\r\n  component: TasklistComponent,\r\n  decorators: [\r\n    moduleMetadata({\r\n      declarations: [TasklistComponent, TaskComponent],\r\n      imports: [\r\n        CommonModule,\r\n        HttpClientModule,\r\n        MarkdownModule.forRoot({ loader: HttpClient }),\r\n      ],\r\n    }),\r\n    applicationConfig({\r\n      providers: [\r\n        importProvidersFrom(\r\n          CommonModule,\r\n          HttpClientModule,\r\n          MarkdownModule.forRoot({ loader: HttpClient }),\r\n          MarkdownService\r\n        ),\r\n      ],\r\n    }),\r\n    componentWrapperDecorator(\r\n      (story) => `<div style=\"margin: 3em\">${story}</div>`\r\n    ),\r\n  ],\r\n}"
             },
             {
                 "name": "Pinned",
@@ -428,6 +578,26 @@
                 "deprecationMessage": "",
                 "type": "Preview",
                 "defaultValue": "{\r\n  parameters: {\r\n    actions: { argTypesRegex: \"^on[A-Z].*\" },\r\n    controls: {\r\n      matchers: {\r\n        color: /(background|color)$/i,\r\n        date: /Date$/,\r\n      },\r\n    },\r\n  },\r\n}"
+            },
+            {
+                "name": "Template",
+                "ctype": "miscellaneous",
+                "subtype": "variable",
+                "file": "src/app/components/tasklist/tasklist.stories.ts",
+                "deprecated": false,
+                "deprecationMessage": "",
+                "type": "tasklistStyleStory",
+                "defaultValue": "{\r\n  args: {\r\n    onPinTask: SimpleTaskStyleStory.DefaultTask.args?.onPinTask,\r\n    onArchiveTask: SimpleTaskStyleStory.DefaultTask.args?.onArchiveTask,\r\n  },\r\n}"
+            },
+            {
+                "name": "WithPinnedTasks",
+                "ctype": "miscellaneous",
+                "subtype": "variable",
+                "file": "src/app/components/tasklist/tasklist.stories.ts",
+                "deprecated": false,
+                "deprecationMessage": "",
+                "type": "tasklistStyleStory",
+                "defaultValue": "{\r\n  args: {\r\n    tasks: [\r\n      ...(Default.args?.['tasks'] as Task[]).slice(0, 5),\r\n      { id: '6', title: 'Task 6 (pinned)', state: 'TASK_PINNED' },\r\n    ],\r\n  },\r\n}"
             }
         ],
         "functions": [],
@@ -438,6 +608,17 @@
                 "subtype": "typealias",
                 "rawtype": "StoryObj<TaskComponent>",
                 "file": "src/app/components/task/task.stories.ts",
+                "deprecated": false,
+                "deprecationMessage": "",
+                "description": "",
+                "kind": 177
+            },
+            {
+                "name": "tasklistStyleStory",
+                "ctype": "miscellaneous",
+                "subtype": "typealias",
+                "rawtype": "StoryObj<TasklistComponent>",
+                "file": "src/app/components/tasklist/tasklist.stories.ts",
                 "deprecated": false,
                 "deprecationMessage": "",
                 "description": "",
@@ -505,7 +686,7 @@
                     "deprecated": false,
                     "deprecationMessage": "",
                     "type": "Meta<TaskComponent>",
-                    "defaultValue": "{\r\n  /* 👇 The title prop is optional.\r\n   * See https://storybook.js.org/docs/angular/configure/overview#configure-story-loading\r\n   * to learn how to generate automatic titles\r\n   */\r\n  title: 'TaskStyle/TaskComponent',\r\n  component: TaskComponent,\r\n}"
+                    "defaultValue": "{\r\n  /* 👇 The title prop is optional.\r\n   * See https://storybook.js.org/docs/angular/configure/overview#configure-story-loading\r\n   * to learn how to generate automatic titles\r\n   */\r\n  title: 'Task/TaskComponent',\r\n  component: TaskComponent,\r\n}"
                 },
                 {
                     "name": "Pinned",
@@ -516,6 +697,68 @@
                     "deprecationMessage": "",
                     "type": "Story",
                     "defaultValue": "{\r\n  args: {\r\n    task: {\r\n      id: '1',\r\n      title: 'Test Task',\r\n      state: 'TASK_PINNED',\r\n    },\r\n  },\r\n}"
+                }
+            ],
+            "src/app/components/tasklist/tasklist.stories.ts": [
+                {
+                    "name": "Default",
+                    "ctype": "miscellaneous",
+                    "subtype": "variable",
+                    "file": "src/app/components/tasklist/tasklist.stories.ts",
+                    "deprecated": false,
+                    "deprecationMessage": "",
+                    "type": "tasklistStyleStory",
+                    "defaultValue": "{\r\n  args: {\r\n    tasks: [\r\n      {\r\n        ...(SimpleTaskStyleStory.DefaultTask.args?.['task'] as Task),\r\n        id: '1',\r\n        title: 'Task 1',\r\n      },\r\n      {\r\n        ...(SimpleTaskStyleStory.DefaultTask.args?.['task'] as Task),\r\n        id: '2',\r\n        title: 'Task 2',\r\n      },\r\n      {\r\n        ...(SimpleTaskStyleStory.DefaultTask.args?.['task'] as Task),\r\n        id: '3',\r\n        title: 'Task 3',\r\n      },\r\n      {\r\n        ...(SimpleTaskStyleStory.DefaultTask.args?.['task'] as Task),\r\n        id: '4',\r\n        title: 'Task 4',\r\n      },\r\n      {\r\n        ...(SimpleTaskStyleStory.DefaultTask.args?.['task'] as Task),\r\n        id: '5',\r\n        title: 'Task 5',\r\n      },\r\n      {\r\n        ...(SimpleTaskStyleStory.DefaultTask.args?.['task'] as Task),\r\n        id: '6',\r\n        title: 'Task 6',\r\n      },\r\n      {\r\n        ...(SimpleTaskStyleStory.DefaultTask.args?.['task'] as Task),\r\n        id: '7',\r\n        title: 'Task 7',\r\n      },\r\n    ],\r\n  },\r\n}"
+                },
+                {
+                    "name": "Empty",
+                    "ctype": "miscellaneous",
+                    "subtype": "variable",
+                    "file": "src/app/components/tasklist/tasklist.stories.ts",
+                    "deprecated": false,
+                    "deprecationMessage": "",
+                    "type": "tasklistStyleStory",
+                    "defaultValue": "{\r\n  args: {\r\n    ...Loading.args,\r\n    loading: false,\r\n  },\r\n}"
+                },
+                {
+                    "name": "Loading",
+                    "ctype": "miscellaneous",
+                    "subtype": "variable",
+                    "file": "src/app/components/tasklist/tasklist.stories.ts",
+                    "deprecated": false,
+                    "deprecationMessage": "",
+                    "type": "tasklistStyleStory",
+                    "defaultValue": "{\r\n  args: {\r\n    tasks: [],\r\n    loading: true,\r\n  },\r\n}"
+                },
+                {
+                    "name": "metaDetail",
+                    "ctype": "miscellaneous",
+                    "subtype": "variable",
+                    "file": "src/app/components/tasklist/tasklist.stories.ts",
+                    "deprecated": false,
+                    "deprecationMessage": "",
+                    "type": "Meta<TasklistComponent>",
+                    "defaultValue": "{\r\n  /* 👇 The title prop is optional.\r\n   * See https://storybook.js.org/docs/angular/configure/overview#configure-story-loading\r\n   * to learn how to generate automatic titles\r\n   */\r\n  title: 'Task/TaskListComponent',\r\n  component: TasklistComponent,\r\n  decorators: [\r\n    moduleMetadata({\r\n      declarations: [TasklistComponent, TaskComponent],\r\n      imports: [\r\n        CommonModule,\r\n        HttpClientModule,\r\n        MarkdownModule.forRoot({ loader: HttpClient }),\r\n      ],\r\n    }),\r\n    applicationConfig({\r\n      providers: [\r\n        importProvidersFrom(\r\n          CommonModule,\r\n          HttpClientModule,\r\n          MarkdownModule.forRoot({ loader: HttpClient }),\r\n          MarkdownService\r\n        ),\r\n      ],\r\n    }),\r\n    componentWrapperDecorator(\r\n      (story) => `<div style=\"margin: 3em\">${story}</div>`\r\n    ),\r\n  ],\r\n}"
+                },
+                {
+                    "name": "Template",
+                    "ctype": "miscellaneous",
+                    "subtype": "variable",
+                    "file": "src/app/components/tasklist/tasklist.stories.ts",
+                    "deprecated": false,
+                    "deprecationMessage": "",
+                    "type": "tasklistStyleStory",
+                    "defaultValue": "{\r\n  args: {\r\n    onPinTask: SimpleTaskStyleStory.DefaultTask.args?.onPinTask,\r\n    onArchiveTask: SimpleTaskStyleStory.DefaultTask.args?.onArchiveTask,\r\n  },\r\n}"
+                },
+                {
+                    "name": "WithPinnedTasks",
+                    "ctype": "miscellaneous",
+                    "subtype": "variable",
+                    "file": "src/app/components/tasklist/tasklist.stories.ts",
+                    "deprecated": false,
+                    "deprecationMessage": "",
+                    "type": "tasklistStyleStory",
+                    "defaultValue": "{\r\n  args: {\r\n    tasks: [\r\n      ...(Default.args?.['tasks'] as Task[]).slice(0, 5),\r\n      { id: '6', title: 'Task 6 (pinned)', state: 'TASK_PINNED' },\r\n    ],\r\n  },\r\n}"
                 }
             ],
             ".storybook/preview.ts": [
@@ -546,6 +789,19 @@
                     "description": "",
                     "kind": 177
                 }
+            ],
+            "src/app/components/tasklist/tasklist.stories.ts": [
+                {
+                    "name": "tasklistStyleStory",
+                    "ctype": "miscellaneous",
+                    "subtype": "typealias",
+                    "rawtype": "StoryObj<TasklistComponent>",
+                    "file": "src/app/components/tasklist/tasklist.stories.ts",
+                    "deprecated": false,
+                    "deprecationMessage": "",
+                    "description": "",
+                    "kind": 177
+                }
             ]
         }
     },
@@ -564,7 +820,7 @@
         ]
     },
     "coverage": {
-        "count": 3,
+        "count": 1,
         "status": "low",
         "files": [
             {
@@ -661,6 +917,75 @@
                 "linktype": "miscellaneous",
                 "linksubtype": "variable",
                 "name": "Pinned",
+                "coveragePercent": 0,
+                "coverageCount": "0/1",
+                "status": "low"
+            },
+            {
+                "filePath": "src/app/components/tasklist/tasklist.component.ts",
+                "type": "component",
+                "linktype": "component",
+                "name": "TasklistComponent",
+                "coveragePercent": 0,
+                "coverageCount": "0/5",
+                "status": "low"
+            },
+            {
+                "filePath": "src/app/components/tasklist/tasklist.stories.ts",
+                "type": "variable",
+                "linktype": "miscellaneous",
+                "linksubtype": "variable",
+                "name": "Default",
+                "coveragePercent": 0,
+                "coverageCount": "0/1",
+                "status": "low"
+            },
+            {
+                "filePath": "src/app/components/tasklist/tasklist.stories.ts",
+                "type": "variable",
+                "linktype": "miscellaneous",
+                "linksubtype": "variable",
+                "name": "Empty",
+                "coveragePercent": 0,
+                "coverageCount": "0/1",
+                "status": "low"
+            },
+            {
+                "filePath": "src/app/components/tasklist/tasklist.stories.ts",
+                "type": "variable",
+                "linktype": "miscellaneous",
+                "linksubtype": "variable",
+                "name": "Loading",
+                "coveragePercent": 0,
+                "coverageCount": "0/1",
+                "status": "low"
+            },
+            {
+                "filePath": "src/app/components/tasklist/tasklist.stories.ts",
+                "type": "variable",
+                "linktype": "miscellaneous",
+                "linksubtype": "variable",
+                "name": "metaDetail",
+                "coveragePercent": 0,
+                "coverageCount": "0/1",
+                "status": "low"
+            },
+            {
+                "filePath": "src/app/components/tasklist/tasklist.stories.ts",
+                "type": "variable",
+                "linktype": "miscellaneous",
+                "linksubtype": "variable",
+                "name": "Template",
+                "coveragePercent": 0,
+                "coverageCount": "0/1",
+                "status": "low"
+            },
+            {
+                "filePath": "src/app/components/tasklist/tasklist.stories.ts",
+                "type": "variable",
+                "linktype": "miscellaneous",
+                "linksubtype": "variable",
+                "name": "WithPinnedTasks",
                 "coveragePercent": 0,
                 "coverageCount": "0/1",
                 "status": "low"

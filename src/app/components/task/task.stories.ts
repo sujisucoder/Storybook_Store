@@ -8,7 +8,7 @@ const meta: Meta<TaskComponent> = {
    * See https://storybook.js.org/docs/angular/configure/overview#configure-story-loading
    * to learn how to generate automatic titles
    */
-  title: 'TaskStyle/TaskComponent',
+  title: 'Task/TaskComponent',
   component: TaskComponent,
 };
 
