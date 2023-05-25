@@ -7,7 +7,7 @@ import { Task } from '../../models/task.model';
   templateUrl: './task.component.html',
   styleUrls: ['./task.component.css'],
 })
-export class TaskComponent {
+export default class TaskComponent {
   @Input()
   task!: Task;
 
